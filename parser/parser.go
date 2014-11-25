@@ -2,15 +2,16 @@ package parser
 
 import (
 	"cyeam_post/models"
+	"fmt"
 )
 
 type ParserContainer interface {
-	Index(i int) models.Post
-	Set(i int, p models.Post)
+	Index(i int) *models.Post
+	Set(i int, p *models.Post) *models.Post
 }
 
 type Parser interface {
-	Parse() ParserContainer
+	Parse() (ParserContainer, error)
 }
 
 var parsers = make(map[string]Parser)
@@ -28,7 +29,7 @@ func Register(name string, parser Parser) {
 	parsers[name] = parser
 }
 
-func NewParser(parser_name string) (*ParserContainer, error) {
+func NewParser(parser_name string) (ParserContainer, error) {
 	parser, ok := parsers[parser_name]
 	if !ok {
 		return nil, fmt.Errorf("parser: unknown parser_name %q", parser_name)
