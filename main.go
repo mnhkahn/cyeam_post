@@ -12,7 +12,11 @@ func Process() {
 	Dao, _ := dao.NewDao("db", "cyeam:qwerty@tcp(128.199.131.129:3306)/cyeam?charset=utf8 ")
 	P, _ := parser.NewParser("cyeam_blog", "http://blog.cyeam.com/rss.xml")
 	for i := 0; i < P.Len(); i++ {
-		Dao.AddPost(P.Index(i))
+		if Dao.IsPostUpdate(P.Index(i)) {
+			Dao.UpdatePost(P.Index(i))
+		} else if Dao.GetPostByLink(P.Index(i).Link) == nil {
+			Dao.AddPost(P.Index(i))
+		}
 	}
 }
 

@@ -42,11 +42,31 @@ func (this *DbDaoContainer) DelPosts(source string) {
 }
 
 func (this *DbDaoContainer) UpdatePost(p *Post) {
-
+	this.Engine.Table("post").Update(p)
 }
 
 func (this *DbDaoContainer) GetPostById(id int) *Post {
-	return nil
+	p := new(Post)
+	p.Id = id
+	this.Engine.Table("post").Get(p)
+	return p
+}
+
+func (this *DbDaoContainer) GetPostByLink(url string) *Post {
+	p := new(Post)
+	p.Link = url
+	this.Engine.Table("post").Get(p)
+	return p
+}
+func (this *DbDaoContainer) IsPostUpdate(p *Post) bool {
+	is_exists := false
+	temp := this.GetPostByLink(p.Link)
+	if temp != nil {
+		if temp.Title != p.Title || temp.Author != p.Author || temp.Detail != p.Detail {
+			is_exists = true
+		}
+	}
+	return is_exists
 }
 
 func (this *DbDaoContainer) Search(q string) []Post {

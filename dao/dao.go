@@ -12,6 +12,8 @@ type DaoContainer interface {
 	DelPosts(source string)
 	UpdatePost(p *Post)
 	GetPostById(id int) *Post
+	GetPostByLink(url string) *Post
+	IsPostUpdate(p *Post) bool
 	Search(q string) []Post
 }
 
