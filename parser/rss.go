@@ -3,8 +3,8 @@ package parser
 import (
 	. "cyeam_post/models"
 	"encoding/xml"
-	"fmt"
 	"github.com/astaxie/beego/httplib"
+	"strings"
 	"time"
 )
 
@@ -24,14 +24,16 @@ func (this *RssParser) Parse(source string) (ParserContainer, error) {
 	for _, item := range res.Channel.Items {
 		post := Post{}
 		post.Title = item.Title
-		// post.CreateTime = time.Parse(time.RFC1123, item.PubDate)
+		post.CreateTime, err = time.Parse(time.RFC3339, strings.Replace(item.PubDate, "+", "Z", 1))
+		if err != nil {
+			post.CreateTime = time.Now()
+		}
 		post.Author = item.Author
 		post.Detail = item.Description
 		post.Category = item.Category
 		post.Figure = item.Figure
 		c.data = append(c.data, post)
 	}
-	fmt.Println(len(c.data))
 	return c, nil
 }
 

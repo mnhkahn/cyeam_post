@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-type Dao interface {
+type DaoContainer interface {
 	AddPost(p *Post)
 	AddPosts(p []Post)
 	DelPost(id int)
@@ -13,6 +13,10 @@ type Dao interface {
 	UpdatePost(p *Post)
 	GetPostById(id int) *Post
 	Search(q string) []Post
+}
+
+type Dao interface {
+	NewDaoImpl(dsn string) (DaoContainer, error)
 }
 
 var daos = make(map[string]Dao)
@@ -30,10 +34,10 @@ func Register(name string, dao Dao) {
 	daos[name] = dao
 }
 
-func NewDao(dao_name string) (Dao, error) {
+func NewDao(dao_name, dsn string) (DaoContainer, error) {
 	dao, ok := daos[dao_name]
 	if !ok {
 		return nil, fmt.Errorf("parser: unknown dao_name %q", dao_name)
 	}
-	return dao, nil
+	return dao.NewDaoImpl(dsn)
 }

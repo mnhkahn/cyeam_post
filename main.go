@@ -9,7 +9,7 @@ import (
 
 func Process() {
 	fmt.Println("Start parse============", time.Now())
-	Dao, _ := dao.NewDao("db")
+	Dao, _ := dao.NewDao("db", "cyeam:qwerty@tcp(128.199.131.129:3306)/cyeam?charset=utf8 ")
 	P, _ := parser.NewParser("cyeam_blog", "http://blog.cyeam.com/rss.xml")
 	for i := 0; i < P.Len(); i++ {
 		Dao.AddPost(P.Index(i))
