@@ -1,7 +1,6 @@
-package db
+package dao
 
 import (
-	. "cyeam_post"
 	. "cyeam_post/models"
 )
 

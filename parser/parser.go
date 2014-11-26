@@ -12,7 +12,7 @@ type ParserContainer interface {
 }
 
 type Parser interface {
-	Parse() (ParserContainer, error)
+	Parse(source string) (ParserContainer, error)
 }
 
 var parsers = make(map[string]Parser)
@@ -30,10 +30,10 @@ func Register(name string, parser Parser) {
 	parsers[name] = parser
 }
 
-func NewParser(parser_name string) (ParserContainer, error) {
+func NewParser(parser_name, source string) (ParserContainer, error) {
 	parser, ok := parsers[parser_name]
 	if !ok {
 		return nil, fmt.Errorf("parser: unknown parser_name %q", parser_name)
 	}
-	return parser.Parse()
+	return parser.Parse(source)
 }

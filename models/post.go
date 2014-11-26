@@ -16,4 +16,5 @@ type Post struct {
 	Description string    `xorm:"TINYTEXT"`
 	Link        string    `xorm:"not null VARCHAR(100)"`
 	Source      string    `xorm:"VARCHAR(40)"`
+	SourceUrl   string    `xorm:"VARCHAR(40)"`
 }
