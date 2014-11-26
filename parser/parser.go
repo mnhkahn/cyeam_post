@@ -8,6 +8,7 @@ import (
 type ParserContainer interface {
 	Index(i int) *models.Post
 	Set(i int, p *models.Post) *models.Post
+	Len() int
 }
 
 type Parser interface {

@@ -31,3 +31,10 @@ func (this *CyeamBlogParserContainer) Set(i int, p *Post) *Post {
 	}
 	return nil
 }
+
+func (this *CyeamBlogParserContainer) Len() int {
+	return len(this.data)
+}
+func init() {
+	Register("cyeam_blog", &CyeamBlogParser{})
+}
