@@ -66,15 +66,15 @@ func (this *DbDaoContainer) GetPostByLink(url string) *Post {
 	return p
 }
 
-func (this *DbDaoContainer) GetPost(author, sort string, limit, start int) *Post {
-	p := new(Post)
-	if author != "" {
-		p.Author = author
+func (this *DbDaoContainer) GetPost(author, sort string, limit, start int) []Post {
+	p := make([]Post, 0)
+	if author == "" {
+		author = "TRUE"
 	}
 	if sort == "" {
 		sort = "create_time desc"
 	}
-	this.Engine.Table("post").OrderBy(sort).Limit(limit, start).Get(p)
+	this.Engine.Table("post").Where("author=?", author).OrderBy(sort).Limit(limit, start).Find(&p)
 	return p
 }
 
