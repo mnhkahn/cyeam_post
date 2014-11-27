@@ -37,7 +37,8 @@ func Process() {
 }
 
 func timer() {
-	timer := time.NewTicker(2 * time.Minute)
+	duration := AppConfig.DefaultInt("parse.duration", 60)
+	timer := time.NewTicker(time.Duration(duration) * time.Minute)
 	for {
 		select {
 		case <-timer.C:
