@@ -13,8 +13,10 @@ type DaoContainer interface {
 	UpdatePost(p *Post)
 	GetPostById(id int) *Post
 	GetPostByLink(url string) *Post
+	GetPost(author, sort string, limit, start int) *Post
 	IsPostUpdate(p *Post) bool
 	Search(q string) []Post
+	Debug(is_debug bool)
 }
 
 type Dao interface {

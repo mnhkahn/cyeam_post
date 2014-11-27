@@ -23,9 +23,11 @@ func (this *RssParser) Parse(source string) (ParserContainer, error) {
 	for _, item := range res.Channel.Items {
 		post := Post{}
 		post.Title = item.Title
-		temp_date := []byte(item.PubDate)
-		post.CreateTime, err = time.Parse("2006-01-02T15:04:05", string(temp_date[:19]))
-		if err != nil {
+		if temp_date, err := time.Parse("2006-01-02T15:04:05", string([]byte(item.PubDate)[:19])); err == nil {
+			post.CreateTime = temp_date
+		} else if temp_date, err := time.Parse("2006-01-02 15:04:05", item.PubDate); err == nil {
+			post.CreateTime = temp_date
+		} else {
 			post.CreateTime = time.Now()
 		}
 		if item.Author != "" {
@@ -38,7 +40,6 @@ func (this *RssParser) Parse(source string) (ParserContainer, error) {
 		post.Figure = item.Figure
 		post.Source = source
 		post.Link = item.Link
-		post.ParseDate = time.Now()
 		c.data = append(c.data, post)
 	}
 	return c, nil
@@ -68,7 +69,7 @@ func (this *RssParserContainer) Len() int {
 	return len(this.data)
 }
 func init() {
-	Register("cyeam_blog", &RssParser{})
+	Register("rss", &RssParser{})
 }
 
 type RssFeed struct {

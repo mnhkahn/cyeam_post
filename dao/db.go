@@ -25,6 +25,10 @@ type DbDaoContainer struct {
 	Engine *xorm.Engine
 }
 
+func (this *DbDaoContainer) Debug(is_debug bool) {
+	this.Engine.ShowDebug = is_debug
+}
+
 func (this *DbDaoContainer) AddPost(p *Post) {
 	this.Engine.Table("post").Insert(p)
 }
@@ -42,7 +46,7 @@ func (this *DbDaoContainer) DelPosts(source string) {
 }
 
 func (this *DbDaoContainer) UpdatePost(p *Post) {
-	this.Engine.Table("post").Update(p)
+	this.Engine.Table("post").Where("link=?", p.Link).Update(p)
 }
 
 func (this *DbDaoContainer) GetPostById(id int) *Post {
@@ -55,18 +59,34 @@ func (this *DbDaoContainer) GetPostById(id int) *Post {
 func (this *DbDaoContainer) GetPostByLink(url string) *Post {
 	p := new(Post)
 	p.Link = url
-	this.Engine.Table("post").Get(p)
+	_, err := this.Engine.Table("post").Get(p)
+	if err != nil {
+		panic(err)
+	}
 	return p
 }
+
+func (this *DbDaoContainer) GetPost(author, sort string, limit, start int) *Post {
+	p := new(Post)
+	if author != "" {
+		p.Author = author
+	}
+	if sort == "" {
+		sort = "create_time desc"
+	}
+	this.Engine.Table("post").OrderBy(sort).Limit(limit, start).Get(p)
+	return p
+}
+
 func (this *DbDaoContainer) IsPostUpdate(p *Post) bool {
-	is_exists := false
+	is_update := false
 	temp := this.GetPostByLink(p.Link)
-	if temp != nil {
-		if temp.Title != p.Title || temp.Author != p.Author || temp.Detail != p.Detail {
-			is_exists = true
+	if temp.Title != "" {
+		if temp.Title != p.Title || temp.Author != p.Author || temp.Detail != p.Detail || temp.Figure != p.Figure {
+			is_update = true
 		}
 	}
-	return is_exists
+	return is_update
 }
 
 func (this *DbDaoContainer) Search(q string) []Post {
