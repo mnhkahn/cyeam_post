@@ -49,8 +49,8 @@ func timer() {
 }
 
 func main() {
-	// timer()
-	Process()
+	timer()
+	// Process()
 }
 
 func init() {
