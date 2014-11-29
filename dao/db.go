@@ -89,8 +89,18 @@ func (this *DbDaoContainer) IsPostUpdate(p *Post) bool {
 	return is_update
 }
 
-func (this *DbDaoContainer) Search(q string) []Post {
+func (this *DbDaoContainer) Search(q string, limit, start int) []Post {
 	res := make([]Post, 0)
+	if q == "" {
+		q = "%"
+	} else {
+		q = "%" + q + "%"
+	}
+	this.Engine.ShowDebug = true
+	err := this.Engine.Table("post").Decr("create_time").Limit(limit, start).Where("title like ? OR detail like ?", q, q).Find(&res)
+	if err != nil {
+		panic(err)
+	}
 	return res
 }
 
