@@ -13,9 +13,8 @@ var AppConfig config.ConfigContainer
 
 func Process() {
 	fmt.Println("Start parse============", time.Now())
-	Dao, _ := dao.NewDao("db", "cyeam:qwerty@tcp(128.199.131.129:3306)/cyeam?charset=utf8")
+	Dao, _ := dao.NewDao("solr", "http://128.199.131.129:8983/solr/post")
 	Dao.Debug(AppConfig.String("runmode") == "dev")
-	// fmt.Println(Dao.GetPost("mangoer_ys", "", 1, 0))
 	rss_list := strings.Split(AppConfig.String("rss.source"), ";")
 	for _, rss := range rss_list {
 		P, err := parser.NewParser("rss", rss)
