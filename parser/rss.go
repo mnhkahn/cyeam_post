@@ -24,11 +24,11 @@ func (this *RssParser) Parse(source string) (ParserContainer, error) {
 		post := Post{}
 		post.Title = item.Title
 		if temp_date, err := time.Parse("2006-01-02T15:04:05", string([]byte(item.PubDate)[:19])); err == nil {
-			post.CreateTime = temp_date
+			post.CreateTime.Time = temp_date
 		} else if temp_date, err := time.Parse("2006-01-02 15:04:05", item.PubDate); err == nil {
-			post.CreateTime = temp_date
+			post.CreateTime.Time = temp_date
 		} else {
-			post.CreateTime = time.Now()
+			post.CreateTime.Time = time.Now()
 		}
 		if item.Author != "" {
 			post.Author = item.Author

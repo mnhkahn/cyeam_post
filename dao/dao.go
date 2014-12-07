@@ -8,7 +8,7 @@ import (
 type DaoContainer interface {
 	AddPost(p *Post)
 	AddPosts(p []Post)
-	DelPost(id int)
+	DelPost(id interface{})
 	DelPosts(source string)
 	UpdatePost(p *Post)
 	GetPostById(id int) *Post
