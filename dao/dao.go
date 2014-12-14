@@ -16,7 +16,7 @@ type DaoContainer interface {
 	GetPostByLink(url string) *Post
 	GetPost(author, sort string, limit, start int) []Post
 	IsPostUpdate(p *Post) bool
-	Search(q string, limit, start int) []Post
+	Search(q string, limit, start int) (int, float64, []Post)
 	Debug(is_debug bool)
 }
 

@@ -105,9 +105,7 @@ func (this *SolrDaoContainer) DelPosts(source string) {
 	this.solr_req.Body = *delSolr
 	this.solr_req.QueryString = query
 
-	if this.is_debug {
-		this.showDebug()
-	}
+	this.showDebug()
 	res, err := this.solr_req.Do()
 	if err != nil {
 		panic(err)
@@ -170,20 +168,24 @@ func (this *SolrDaoContainer) IsPostUpdate(p *Post) bool {
 	return is_update
 }
 
-func (this *SolrDaoContainer) Search(q string, limit, start int) []Post {
+func (this *SolrDaoContainer) Search(q string, limit, start int) (int, float64, []Post) {
 	this.solr_req.Method = "GET"
 	this.solr_req.Uri = this.dsn + "/select"
 
 	query := url.Values{}
 	query.Add("wt", "json")
-	query.Add("q", fmt.Sprintf("title:*%s* AND detail:*%s*", q, q))
+	query.Add("q", fmt.Sprintf("description:%s", q))
 	query.Add("start", fmt.Sprintf("%d", start))
 	query.Add("rows", fmt.Sprintf("%d", limit))
+	query.Add("hl", "true")
+	query.Add("hl.simple.pre", "<em>")
+	query.Add("hl.simple.post", "</em>")
+	query.Add("hl.fl", "description")
+	query.Add("hl.highlightMultiTerm", "true")
+	query.Add("sort", "figure desc, create_time desc")
 	this.solr_req.QueryString = query
 
-	if this.is_debug {
-		this.showDebug()
-	}
+	this.showDebug()
 	res, err := this.solr_req.Do()
 	if err != nil {
 		panic(err)
@@ -194,7 +196,10 @@ func (this *SolrDaoContainer) Search(q string, limit, start int) []Post {
 	if err != nil {
 		panic(err)
 	}
-	return solr_posts.Response.Docs
+	for i := 0; i < len(solr_posts.Response.Docs); i++ {
+		solr_posts.Response.Docs[i].Description = solr_posts.Highlighting[solr_posts.Response.Docs[i].Link]["description"][0]
+	}
+	return solr_posts.Response.NumFound, solr_posts.ResponseHeader.QTime, solr_posts.Response.Docs
 }
 
 func (this *SolrDaoContainer) showDebug() {
@@ -228,12 +233,13 @@ type DelSolr struct {
 
 type SolrPost struct {
 	Response struct {
-		Docs     []Post  `json:"docs"`
-		NumFound float64 `json:"numFound"`
-		Start    float64 `json:"start"`
+		Docs     []Post `json:"docs"`
+		NumFound int    `json:"numFound"`
+		Start    int    `json:"start"`
 	} `json:"response"`
-	ResponseHeader SolrResponseHeader `json:"responseHeader"`
-	Error          SolrError          `json:"error"`
+	ResponseHeader SolrResponseHeader             `json:"responseHeader"`
+	Error          SolrError                      `json:"error"`
+	Highlighting   map[string]map[string][]string `json:"highlighting"`
 }
 
 type SolrResponseHeader struct {
@@ -243,7 +249,7 @@ type SolrResponseHeader struct {
 		Q      string `json:"q"`
 		Wt     string `json:"wt"`
 	} `json:"params"`
-	Status float64 `json:"status"`
+	Status int `json:"status"`
 }
 
 type SolrError struct {
