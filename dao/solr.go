@@ -121,6 +121,10 @@ func (this *SolrDaoContainer) UpdatePost(p *Post) {
 
 }
 
+func (this *SolrDaoContainer) AddOrUpdate(p *Post) {
+	this.AddPost(p)
+}
+
 func (this *SolrDaoContainer) GetPostById(id int) *Post {
 	p := new(Post)
 	return p

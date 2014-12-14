@@ -22,15 +22,7 @@ func Process() {
 			panic(err)
 		}
 		for i := 0; i < P.Len(); i++ {
-			if Dao.IsPostUpdate(P.Index(i)) {
-				fmt.Println("upate**************", P.Index(i).Title)
-				Dao.UpdatePost(P.Index(i))
-			} else if Dao.GetPostByLink(P.Index(i).Link).Title == "" {
-				fmt.Println("add****************", P.Index(i).Title)
-				Dao.AddPost(P.Index(i))
-			} else {
-				fmt.Println("already exists & not changed**************", P.Index(i).Title)
-			}
+			Dao.AddOrUpdate(P.Index(i))
 		}
 	}
 }
@@ -49,8 +41,8 @@ func timer() {
 }
 
 func main() {
+	Process()
 	timer()
-	// Process()
 }
 
 func init() {

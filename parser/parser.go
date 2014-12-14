@@ -3,6 +3,7 @@ package parser
 import (
 	"cyeam_post/models"
 	"fmt"
+	"regexp"
 )
 
 type ParserContainer interface {
@@ -36,4 +37,9 @@ func NewParser(parser_name, source string) (ParserContainer, error) {
 		return nil, fmt.Errorf("parser: unknown parser_name %q", parser_name)
 	}
 	return parser.Parse(source)
+}
+
+func RemoveHtml(src string) string {
+	re_html := regexp.MustCompile("(?is)<.*?>")
+	return re_html.ReplaceAllString(src, "")
 }
