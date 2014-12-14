@@ -121,6 +121,10 @@ func (this *SolrDaoContainer) UpdatePost(p *Post) {
 
 }
 
+func (this *SolrDaoContainer) AddOrUpdate(p *Post) {
+	this.AddPost(p)
+}
+
 func (this *SolrDaoContainer) GetPostById(id int) *Post {
 	p := new(Post)
 	return p
@@ -167,8 +171,30 @@ func (this *SolrDaoContainer) IsPostUpdate(p *Post) bool {
 }
 
 func (this *SolrDaoContainer) Search(q string, limit, start int) []Post {
-	res := make([]Post, 0)
-	return res
+	this.solr_req.Method = "GET"
+	this.solr_req.Uri = this.dsn + "/select"
+
+	query := url.Values{}
+	query.Add("wt", "json")
+	query.Add("q", fmt.Sprintf("title:*%s* AND detail:*%s*", q, q))
+	query.Add("start", fmt.Sprintf("%d", start))
+	query.Add("rows", fmt.Sprintf("%d", limit))
+	this.solr_req.QueryString = query
+
+	if this.is_debug {
+		this.showDebug()
+	}
+	res, err := this.solr_req.Do()
+	if err != nil {
+		panic(err)
+	}
+
+	solr_posts := new(SolrPost)
+	err = res.Body.FromJsonTo(solr_posts)
+	if err != nil {
+		panic(err)
+	}
+	return solr_posts.Response.Docs
 }
 
 func (this *SolrDaoContainer) showDebug() {

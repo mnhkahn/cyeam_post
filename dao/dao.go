@@ -11,6 +11,7 @@ type DaoContainer interface {
 	DelPost(id interface{})
 	DelPosts(source string)
 	UpdatePost(p *Post)
+	AddOrUpdate(p *Post)
 	GetPostById(id int) *Post
 	GetPostByLink(url string) *Post
 	GetPost(author, sort string, limit, start int) []Post

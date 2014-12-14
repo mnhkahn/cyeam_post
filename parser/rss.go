@@ -36,6 +36,7 @@ func (this *RssParser) Parse(source string) (ParserContainer, error) {
 			post.Author = res.Channel.Title
 		}
 		post.Detail = item.Description
+		post.Description = RemoveHtml(item.Description)
 		post.Category = item.Category
 		post.Figure = item.Figure
 		post.Source = source
