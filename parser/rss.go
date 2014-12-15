@@ -41,6 +41,7 @@ func (this *RssParser) Parse(source string) (ParserContainer, error) {
 		post.Figure = item.Figure
 		post.Source = source
 		post.Link = item.Link
+		post.ParseDate.Time = time.Now()
 		c.data = append(c.data, post)
 	}
 	return c, nil
