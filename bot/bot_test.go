@@ -1,14 +1,24 @@
 package bot
 
 import (
+	"cyeam_post/dao"
+	"cyeam_post/parser"
 	"testing"
 )
 
-func TestMain(t *testing.T) {
-	bot, err := NewBot("cybot1.0", "http://localhost:8080")
+func TestRss(t *testing.T) {
+	bot, err := NewBot("RssBot")
 	if err != nil {
 		panic(err)
 	}
+	Dao, err := dao.NewDao("solr", "http://128.199.131.129:8983/solr/post")
+	Dao.Debug(true)
+	if err != nil {
+		panic(err)
+	}
+	parser, err := parser.NewParser("RssParser")
+
+	bot.Init(parser, Dao)
 	bot.Debug(true)
-	bot.Start()
+	bot.Start("http://blog.cyeam.com/rss.xml")
 }

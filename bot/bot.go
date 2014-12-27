@@ -1,18 +1,17 @@
 package bot
 
 import (
-	"cyeam_post/models"
+	"cyeam_post/dao"
+	// "cyeam_post/models"
+	"cyeam_post/parser"
 	"fmt"
 )
 
-type BotContainer interface {
-	Start()
-	ParseHtml(url string) (models.Post, []string, error)
-	Debug(is_debug bool)
-}
-
 type Bot interface {
-	NewJob(job string) (BotContainer, error)
+	Init(parser parser.Parser, dao dao.DaoContainer)
+	Start(root string)
+	Debug(is_debug bool)
+	Version() string
 }
 
 var bots = make(map[string]Bot)
@@ -27,17 +26,10 @@ func Register(name string, bot Bot) {
 	bots[name] = bot
 }
 
-func NewBot(name, job string) (BotContainer, error) {
+func NewBot(name string) (Bot, error) {
 	bot, ok := bots[name]
 	if !ok {
 		return nil, fmt.Errorf("bot: unknown bot_name %q", name)
 	}
-	return bot.NewJob(job)
-}
-
-type CyeamBot struct {
-	Name    string
-	Version string
-	Job     string
-	IsDebug bool
+	return bot, nil
 }
