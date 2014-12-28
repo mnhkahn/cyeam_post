@@ -1,27 +1,33 @@
 package parser
 
-// import (
-// 	"cyeam_post/common"
-// 	"cyeam_post/models"
-// )
+import (
+	"cyeam_post/models"
+	// "fmt"
+	"github.com/astaxie/beego/httplib"
+)
 
-// type CyParserContainer struct {
-// 	common.CyeamBot
-// }
+type CyParser struct {
+	RegParser
+	NormalParser
+}
 
-// func (this *CyParserContainer) ParseHtml() (models.Post, []string, error) {
-// 	post := models.Post{}
-// 	return post, nil, nil
-// }
+func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
+	// post.Link = this.GetUrl(post.Link)
+	req := httplib.Get(post.Link)
+	body, err := req.String()
+	if err != nil {
+		return nil, err
+	}
+	post.Detail = body
+	imgs := this.GetImgs(body)
+	// fmt.Println(imgs)
+	if len(imgs) > 0 {
+		post.Figure = imgs[0]
+	}
+	next_urls := this.GetAs(body)
+	return next_urls, nil
+}
 
-// type CyParser struct {
-// }
-
-// func (this *CyParser) Parse() (ParserContainer, error) {
-// 	c := new(CyParserContainer)
-// 	return c, nil
-// }
-
-// func init() {
-// 	Register("cypaser1.0", &CyParser{})
-// }
+func init() {
+	Register("CyParser", &CyParser{})
+}
