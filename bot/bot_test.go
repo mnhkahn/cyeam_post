@@ -37,5 +37,6 @@ func TestCy(t *testing.T) {
 
 	bot.Init(parser, Dao)
 	bot.Debug(true)
-	bot.Start("http://localhost:8080")
+	// bot.Start("http://localhost:8080")
+	bot.Start("http://www.cyeam.com")
 }
