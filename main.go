@@ -3,10 +3,10 @@ package main
 import (
 	"cyeam_post/bot"
 	"cyeam_post/dao"
+	. "cyeam_post/logs"
 	"cyeam_post/parser"
 	"fmt"
 	"github.com/astaxie/beego/config"
-	// "strings"
 	"time"
 )
 
@@ -32,6 +32,7 @@ func Process() {
 	bot.Start(AppConfig.String("rss.source"))
 
 	fmt.Println("End parse==========")
+	Log.Close()
 }
 
 func timer() {
