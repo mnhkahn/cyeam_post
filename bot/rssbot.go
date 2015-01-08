@@ -1,27 +1,37 @@
-package parser
+package bot
 
 import (
-	. "cyeam_post/models"
+	"cyeam_post/common"
+	"cyeam_post/dao"
+	"cyeam_post/models"
+	"cyeam_post/parser"
 	"encoding/xml"
 	"github.com/astaxie/beego/httplib"
+	"reflect"
 	"time"
 )
 
-type RssParser struct {
+type RssBot struct {
+	common.CyeamBot
+	parser parser.Parser
+	dao    dao.DaoContainer
 }
 
-func (this *RssParser) Parse(source string) (ParserContainer, error) {
-	c := new(RssParserContainer)
-	c.source = source
+func (this *RssBot) Init(parser parser.Parser, dao dao.DaoContainer) {
+	this.Name = reflect.TypeOf(this).String()
+	this.parser = parser
+	this.dao = dao
+}
 
+func (this *RssBot) Start(root string) {
 	res := RssFeed{}
-	req := httplib.Get(c.source)
+	req := httplib.Get(root)
 	err := req.ToXml(&res)
 	if err != nil {
-		return c, err
+		panic(err)
 	}
 	for _, item := range res.Channel.Items {
-		post := Post{}
+		post := new(models.Post)
 		post.Title = item.Title
 		if temp_date, err := time.Parse("2006-01-02T15:04:05", string([]byte(item.PubDate)[:19])); err == nil {
 			post.CreateTime.Time = temp_date
@@ -36,42 +46,27 @@ func (this *RssParser) Parse(source string) (ParserContainer, error) {
 			post.Author = res.Channel.Title
 		}
 		post.Detail = item.Description
-		post.Description = RemoveHtml(item.Description)
 		post.Category = item.Category
 		post.Figure = item.Figure
-		post.Source = source
+		post.Source = root
 		post.Link = item.Link
 		post.ParseDate.Time = time.Now()
-		c.data = append(c.data, post)
+
+		this.parser.ParseHtml(post)
+		this.dao.AddOrUpdate(post)
 	}
-	return c, nil
 }
 
-type RssParserContainer struct {
-	source string
-	data   []Post
+func (this *RssBot) Debug(is_debug bool) {
+	this.IsDebug = is_debug
 }
 
-func (this *RssParserContainer) Index(i int) *Post {
-	if len(this.data) > i {
-		return &this.data[i]
-	}
-	return nil
+func (this *RssBot) Version() string {
+	return this.Name
 }
 
-func (this *RssParserContainer) Set(i int, p *Post) *Post {
-	if len(this.data) > i {
-		this.data[i] = *p
-		return p
-	}
-	return nil
-}
-
-func (this *RssParserContainer) Len() int {
-	return len(this.data)
-}
 func init() {
-	Register("rss", &RssParser{})
+	Register("RssBot", &RssBot{})
 }
 
 type RssFeed struct {

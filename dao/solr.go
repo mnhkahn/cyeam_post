@@ -3,6 +3,7 @@ package dao
 import (
 	. "cyeam_post/models"
 	// "encoding/json"
+	. "cyeam_post/logs"
 	"fmt"
 	"github.com/franela/goreq"
 	"net/url"
@@ -54,13 +55,10 @@ func (this *SolrDaoContainer) AddPost(p *Post) {
 	if this.is_debug {
 		this.showDebug()
 	}
-	res, err := this.solr_req.Do()
+	_, err := this.solr_req.Do()
 	if err != nil {
 		panic(err)
 	}
-
-	str, _ := res.Body.ToString()
-	fmt.Println(str)
 }
 
 func (this *SolrDaoContainer) AddPosts(p []Post) {
@@ -83,13 +81,10 @@ func (this *SolrDaoContainer) DelPost(id interface{}) {
 	if this.is_debug {
 		this.showDebug()
 	}
-	res, err := this.solr_req.Do()
+	_, err := this.solr_req.Do()
 	if err != nil {
 		panic(err)
 	}
-
-	str, _ := res.Body.ToString()
-	fmt.Println(str)
 }
 
 func (this *SolrDaoContainer) DelPosts(source string) {
@@ -106,13 +101,10 @@ func (this *SolrDaoContainer) DelPosts(source string) {
 	this.solr_req.QueryString = query
 
 	this.showDebug()
-	res, err := this.solr_req.Do()
+	_, err := this.solr_req.Do()
 	if err != nil {
 		panic(err)
 	}
-
-	str, _ := res.Body.ToString()
-	fmt.Println(str)
 }
 
 func (this *SolrDaoContainer) UpdatePost(p *Post) {
@@ -208,7 +200,7 @@ func (this *SolrDaoContainer) showDebug() {
 		if this.solr_req.QueryString != nil {
 			debug_url += "?" + url.Values(this.solr_req.QueryString.(url.Values)).Encode()
 		}
-		fmt.Printf("[solr] %s\n %v\n", debug_url, this.solr_req.Body)
+		Log.Debug("[solr] %s\n", debug_url)
 	}
 }
 

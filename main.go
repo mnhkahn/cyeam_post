@@ -1,30 +1,37 @@
 package main
 
 import (
+	"cyeam_post/bot"
 	"cyeam_post/dao"
 	"cyeam_post/parser"
 	"fmt"
 	"github.com/astaxie/beego/config"
-	"strings"
+	// "strings"
 	"time"
 )
 
 var AppConfig config.ConfigContainer
 
+var bots_parser map[bot.Bot]parser.Parser
+
 func Process() {
-	fmt.Println("Start parse============", time.Now())
-	Dao, _ := dao.NewDao("solr", "http://128.199.131.129:8983/solr/post")
-	Dao.Debug(AppConfig.String("runmode") == "dev")
-	rss_list := strings.Split(AppConfig.String("rss.source"), ";")
-	for _, rss := range rss_list {
-		P, err := parser.NewParser("rss", rss)
-		if err != nil {
-			panic(err)
-		}
-		for i := 0; i < P.Len(); i++ {
-			Dao.AddOrUpdate(P.Index(i))
-		}
+	fmt.Println("Start parse==========")
+	bot, err := bot.NewBot("RssBot")
+	if err != nil {
+		panic(err)
 	}
+	Dao, err := dao.NewDao("solr", "http://128.199.131.129:8983/solr/post")
+	Dao.Debug(true)
+	if err != nil {
+		panic(err)
+	}
+	parser, err := parser.NewParser("RssParser")
+
+	bot.Init(parser, Dao)
+	bot.Debug(true)
+	bot.Start(AppConfig.String("rss.source"))
+
+	fmt.Println("End parse==========")
 }
 
 func timer() {
