@@ -2,7 +2,8 @@ package parser
 
 import (
 	"cyeam_post/models"
-	"fmt"
+	// "fmt"
+	. "cyeam_post/logs"
 	"github.com/astaxie/beego/httplib"
 )
 
@@ -12,7 +13,7 @@ type CyParser struct {
 }
 
 func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
-	fmt.Println(post.Link, "@@@@")
+	Log.Info(post.Link)
 	// post.Link = this.GetUrl(post.Link)
 	req := httplib.Get(post.Link)
 	body, err := req.String()

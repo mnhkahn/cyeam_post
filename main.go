@@ -4,7 +4,7 @@ import (
 	"cyeam_post/bot"
 	"cyeam_post/dao"
 	"cyeam_post/parser"
-	// "fmt"
+	"fmt"
 	"github.com/astaxie/beego/config"
 	// "strings"
 	"time"
@@ -15,6 +15,7 @@ var AppConfig config.ConfigContainer
 var bots_parser map[bot.Bot]parser.Parser
 
 func Process() {
+	fmt.Println("Start parse==========")
 	bot, err := bot.NewBot("RssBot")
 	if err != nil {
 		panic(err)
@@ -29,6 +30,8 @@ func Process() {
 	bot.Init(parser, Dao)
 	bot.Debug(true)
 	bot.Start(AppConfig.String("rss.source"))
+
+	fmt.Println("End parse==========")
 }
 
 func timer() {

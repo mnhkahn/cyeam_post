@@ -5,7 +5,8 @@ import (
 	"cyeam_post/dao"
 	"cyeam_post/models"
 	"cyeam_post/parser"
-	"fmt"
+	// "fmt"
+	. "cyeam_post/logs"
 	"reflect"
 	"strings"
 )
@@ -55,7 +56,7 @@ func (this *CyBot) Start(root string) {
 				res[u] = post
 			}
 		}
-		fmt.Println(Q_next, "###", res)
+		Log.Info("%v | %s", Q_next, res)
 		Q = Q_next
 		Q_next = []string{}
 	}
