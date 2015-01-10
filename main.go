@@ -21,7 +21,7 @@ func Process() {
 		panic(err)
 	}
 	Dao, err := dao.NewDao("solr", "http://128.199.131.129:8983/solr/post")
-	Dao.Debug(true)
+	// Dao.Debug(true)
 	if err != nil {
 		panic(err)
 	}
