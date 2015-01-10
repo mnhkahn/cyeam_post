@@ -3,10 +3,10 @@ package main
 import (
 	"cyeam_post/bot"
 	"cyeam_post/dao"
+	. "cyeam_post/logs"
 	"cyeam_post/parser"
 	"fmt"
 	"github.com/astaxie/beego/config"
-	// "strings"
 	"time"
 )
 
@@ -21,7 +21,7 @@ func Process() {
 		panic(err)
 	}
 	Dao, err := dao.NewDao("solr", "http://128.199.131.129:8983/solr/post")
-	Dao.Debug(true)
+	// Dao.Debug(true)
 	if err != nil {
 		panic(err)
 	}
@@ -32,6 +32,7 @@ func Process() {
 	bot.Start(AppConfig.String("rss.source"))
 
 	fmt.Println("End parse==========")
+	Log.Close()
 }
 
 func timer() {

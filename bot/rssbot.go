@@ -3,6 +3,7 @@ package bot
 import (
 	"cyeam_post/common"
 	"cyeam_post/dao"
+	. "cyeam_post/logs"
 	"cyeam_post/models"
 	"cyeam_post/parser"
 	"encoding/xml"
@@ -26,11 +27,14 @@ func (this *RssBot) Init(parser parser.Parser, dao dao.DaoContainer) {
 func (this *RssBot) Start(root string) {
 	res := RssFeed{}
 	req := httplib.Get(root)
+	req.SetTimeout(5*time.Second, 5*time.Second)
 	err := req.ToXml(&res)
 	if err != nil {
 		panic(err)
 	}
+	Log.Info("Parse complete.")
 	for _, item := range res.Channel.Items {
+		Log.Debug(item.Link)
 		post := new(models.Post)
 		post.Title = item.Title
 		if temp_date, err := time.Parse("2006-01-02T15:04:05", string([]byte(item.PubDate)[:19])); err == nil {

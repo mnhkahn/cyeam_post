@@ -200,7 +200,7 @@ func (this *SolrDaoContainer) showDebug() {
 		if this.solr_req.QueryString != nil {
 			debug_url += "?" + url.Values(this.solr_req.QueryString.(url.Values)).Encode()
 		}
-		Log.Debug("[solr] %s\n", debug_url)
+		Log.Trace("[solr] %s", debug_url)
 	}
 }
 
