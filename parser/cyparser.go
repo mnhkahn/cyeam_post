@@ -4,6 +4,7 @@ import (
 	. "cyeam_post/logs"
 	"cyeam_post/models"
 	"github.com/astaxie/beego/httplib"
+	"time"
 )
 
 type CyParser struct {
@@ -20,6 +21,8 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 	}
 	// post.Link = this.GetUrl(post.Link)
 	req := httplib.Get(post.Link)
+	req.SetUserAgent("Cyeambot")
+	req.SetTimeout(time.Second*5, time.Second*5)
 	body, err := req.String()
 	if err != nil {
 		return nil, err

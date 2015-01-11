@@ -27,6 +27,7 @@ func (this *RssBot) Init(parser parser.Parser, dao dao.DaoContainer) {
 func (this *RssBot) Start(root string) {
 	res := RssFeed{}
 	req := httplib.Get(root)
+	req.SetUserAgent("Cyeambot")
 	req.SetTimeout(5*time.Second, 5*time.Second)
 	err := req.ToXml(&res)
 	if err != nil {
