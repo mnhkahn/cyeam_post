@@ -19,7 +19,7 @@ func (this *SolrDao) NewDaoImpl(dsn string) (DaoContainer, error) {
 	solr.dsn = dsn
 	solr.solr_req = goreq.Request{
 		ContentType: "application/json",
-		UserAgent:   "Cyeam",
+		UserAgent:   "Cyeambot",
 		Timeout:     time.Duration(5) * time.Second,
 		// Compression: goreq.Gzip(),
 	}

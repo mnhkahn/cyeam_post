@@ -16,7 +16,7 @@ var bots_parser map[bot.Bot]parser.Parser
 
 func Process() {
 	fmt.Println("Start parse==========")
-	bot, err := bot.NewBot("RssBot")
+	bot, err := bot.NewBot("CyBot")
 	if err != nil {
 		panic(err)
 	}
@@ -25,11 +25,11 @@ func Process() {
 	if err != nil {
 		panic(err)
 	}
-	parser, err := parser.NewParser("RssParser")
+	parser, err := parser.NewParser("CyParser")
 
 	bot.Init(parser, Dao)
 	bot.Debug(true)
-	bot.Start(AppConfig.String("rss.source"))
+	bot.Start(AppConfig.String("root"))
 
 	fmt.Println("End parse==========")
 	Log.Close()

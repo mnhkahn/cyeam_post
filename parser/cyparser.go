@@ -1,9 +1,8 @@
 package parser
 
 import (
-	"cyeam_post/models"
-	// "fmt"
 	. "cyeam_post/logs"
+	"cyeam_post/models"
 	"github.com/astaxie/beego/httplib"
 )
 
@@ -14,6 +13,11 @@ type CyParser struct {
 
 func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 	Log.Info(post.Link)
+	var err error
+	post.Source, err = this.GetHost(post.Link)
+	if err != nil {
+		return nil, err
+	}
 	// post.Link = this.GetUrl(post.Link)
 	req := httplib.Get(post.Link)
 	body, err := req.String()
@@ -26,7 +30,7 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 	if len(imgs) > 0 {
 		post.Figure = imgs[0]
 	}
-	next_urls := this.GetAs(body)
+	next_urls := this.GetAs(body, "http://"+post.Source)
 	return next_urls, nil
 }
 

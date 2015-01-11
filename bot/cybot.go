@@ -3,10 +3,9 @@ package bot
 import (
 	"cyeam_post/common"
 	"cyeam_post/dao"
+	. "cyeam_post/logs"
 	"cyeam_post/models"
 	"cyeam_post/parser"
-	// "fmt"
-	. "cyeam_post/logs"
 	"reflect"
 	"strings"
 )
@@ -34,7 +33,7 @@ func (this *CyBot) Start(root string) {
 
 	// var a = 0
 	for len(Q) > 0 || len(Q_next) > 0 {
-		// fmt.Println("***********", Q)
+		// Log.Debug("%v", Q)
 		for len(Q) != 0 {
 			u := Q[0]
 			Q = Q[1:]
@@ -48,7 +47,7 @@ func (this *CyBot) Start(root string) {
 							break
 						}
 					}
-					// fmt.Println(exist, next_url)
+					Log.Trace("%v %s", exist, next_url)
 					if exist {
 						Q_next = append(Q_next, next_url)
 					}
@@ -56,7 +55,6 @@ func (this *CyBot) Start(root string) {
 				res[u] = post
 			}
 		}
-		Log.Info("%v | %s", Q_next, res)
 		Q = Q_next
 		Q_next = []string{}
 	}

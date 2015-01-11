@@ -8,6 +8,7 @@ import (
 var Log = logs.NewLogger(10000)
 
 func init() {
+	Log.EnableFuncCallDepth(true)
 	if beego.AppConfig.String("runmode") == "dev" {
 		Log.SetLogger("console", `{"level":8}`)
 	} else {
