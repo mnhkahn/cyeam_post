@@ -8,6 +8,7 @@ import (
 	"cyeam_post/parser"
 	"reflect"
 	"strings"
+	// "time"
 )
 
 type CyBot struct {
@@ -38,7 +39,9 @@ func (this *CyBot) Start(root string) {
 			u := Q[0]
 			Q = Q[1:]
 			if _, ok := res[u]; !ok { // 过滤掉抓取过的网页
+				Log.Info("Start parse: %s", u)
 				post, next_urls := this.new(u)
+				// time.Sleep(5 * time.Second)
 				for _, next_url := range next_urls {
 					exist := false
 					for _, white := range this.whitelist {
@@ -47,7 +50,7 @@ func (this *CyBot) Start(root string) {
 							break
 						}
 					}
-					Log.Trace("%v %s", exist, next_url)
+					// Log.Trace("%v %s", exist, next_url)
 					if exist {
 						Q_next = append(Q_next, next_url)
 					}

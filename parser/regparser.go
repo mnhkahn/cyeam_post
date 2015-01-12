@@ -29,7 +29,7 @@ func (this *RegParser) GetAs(body, host string) []string {
 			temp = temp[strings.Index(string(temp), "href")+6 : len(temp)-1]
 			next_urls[i] = string(temp)
 			// 如果url以/开头，需要拼接上http协议头和域名
-			if strings.HasPrefix(next_urls[i], "/") {
+			if next_urls[i] == "" || strings.HasPrefix(next_urls[i], "/") {
 				next_urls[i] = host + next_urls[i]
 			}
 			// 如果url中包含标签#，需要将标签删掉
