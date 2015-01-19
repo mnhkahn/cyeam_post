@@ -3,7 +3,6 @@ package dao
 import (
 	. "cyeam_post/models"
 	// "encoding/json"
-	. "cyeam_post/logs"
 	"fmt"
 	"github.com/franela/goreq"
 	"net/url"
@@ -35,7 +34,7 @@ type SolrDaoContainer struct {
 }
 
 func (this *SolrDaoContainer) Debug(is_debug bool) {
-	this.is_debug = is_debug
+	this.solr_req.ShowDebug = is_debug
 }
 
 func (this *SolrDaoContainer) AddPost(p *Post) {
@@ -52,9 +51,6 @@ func (this *SolrDaoContainer) AddPost(p *Post) {
 	this.solr_req.Body = *addSolr
 	this.solr_req.QueryString = query
 
-	if this.is_debug {
-		this.showDebug()
-	}
 	_, err := this.solr_req.Do()
 	if err != nil {
 		panic(err)
@@ -78,9 +74,6 @@ func (this *SolrDaoContainer) DelPost(id interface{}) {
 	this.solr_req.Body = *delSolr
 	this.solr_req.QueryString = query
 
-	if this.is_debug {
-		this.showDebug()
-	}
 	_, err := this.solr_req.Do()
 	if err != nil {
 		panic(err)
@@ -100,7 +93,6 @@ func (this *SolrDaoContainer) DelPosts(source string) {
 	this.solr_req.Body = *delSolr
 	this.solr_req.QueryString = query
 
-	this.showDebug()
 	_, err := this.solr_req.Do()
 	if err != nil {
 		panic(err)
@@ -139,9 +131,6 @@ func (this *SolrDaoContainer) GetPost(author, sort string, limit, start int) []P
 	query.Add("rows", fmt.Sprintf("%d", limit))
 	this.solr_req.QueryString = query
 
-	if this.is_debug {
-		this.showDebug()
-	}
 	res, err := this.solr_req.Do()
 	if err != nil {
 		panic(err)
@@ -177,7 +166,6 @@ func (this *SolrDaoContainer) Search(q string, limit, start int) (int, float64, 
 	query.Add("sort", "figure desc, create_time desc")
 	this.solr_req.QueryString = query
 
-	this.showDebug()
 	res, err := this.solr_req.Do()
 	if err != nil {
 		panic(err)
@@ -192,16 +180,6 @@ func (this *SolrDaoContainer) Search(q string, limit, start int) (int, float64, 
 		solr_posts.Response.Docs[i].Description = solr_posts.Highlighting[solr_posts.Response.Docs[i].Link]["description"][0]
 	}
 	return solr_posts.Response.NumFound, solr_posts.ResponseHeader.QTime, solr_posts.Response.Docs
-}
-
-func (this *SolrDaoContainer) showDebug() {
-	if this.is_debug {
-		debug_url := this.solr_req.Uri
-		if this.solr_req.QueryString != nil {
-			debug_url += "?" + url.Values(this.solr_req.QueryString.(url.Values)).Encode()
-		}
-		Log.Trace("[solr] %s", debug_url)
-	}
 }
 
 func init() {

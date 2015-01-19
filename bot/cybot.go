@@ -39,6 +39,7 @@ func (this *CyBot) Start(root string) {
 			Q = Q[1:]
 			if _, ok := res[u]; !ok { // 过滤掉抓取过的网页
 				post, next_urls := this.new(u)
+				this.dao.AddPost(post)
 				for _, next_url := range next_urls {
 					exist := false
 					for _, white := range this.whitelist {
