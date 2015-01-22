@@ -163,7 +163,7 @@ func (this *SolrDaoContainer) Search(q string, limit, start int) (int, float64, 
 	query.Add("hl.simple.post", "</em>")
 	query.Add("hl.fl", "description")
 	query.Add("hl.highlightMultiTerm", "true")
-	query.Add("sort", "figure desc, create_time desc")
+	// query.Add("sort", "figure desc, create_time desc")
 	this.solr_req.QueryString = query
 
 	res, err := this.solr_req.Do()

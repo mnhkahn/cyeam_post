@@ -3,8 +3,9 @@ package parser
 import (
 	"cyeam_post/cygo"
 	"cyeam_post/models"
-	"fmt"
+	// "fmt"
 	"github.com/franela/goreq"
+	"strings"
 	"time"
 )
 
@@ -19,15 +20,14 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	// post.Link = this.GetUrl(post.Link)
 	req := goreq.Request{
-		Method:      "GET",
-		Uri:         post.Link,
-		ContentType: "application/json",
-		UserAgent:   "Cyeambot",
-		Timeout:     time.Duration(60) * time.Second,
+		Method:    "GET",
+		Uri:       post.Link + "?v=1",
+		UserAgent: "Cyeambot",
+		Timeout:   time.Duration(60) * time.Second,
+		ShowDebug: true,
 		// Proxy:       "http://114.255.183.173:8080",
-		Compression: goreq.Gzip(),
+		// Compression: goreq.Gzip(),
 	}
 	req.AddHeader("Accept-Language", "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4")
 	goreq.SetConnectTimeout(time.Duration(60) * time.Second)
@@ -37,20 +37,24 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 	}
 
 	body, err := res.Body.ToString()
-	fmt.Println(body, err)
 	if err != nil {
 		return nil, err
 	}
-	// post.Title =
+	post.Title = this.GetTitle(body)
 	post.CreateTime = cygo.Now()
 	post.Author = "Cyeam"
 	post.Detail = body
 	imgs := this.GetImgs(body)
 	// fmt.Println(imgs)
 	if len(imgs) > 0 {
-		post.Figure = imgs[0]
+		src := this.GetImgSrc(imgs[0])
+		if strings.HasPrefix(src, "/") {
+			post.Figure = "http://" + post.Source + src
+		} else {
+			post.Figure = src
+		}
 	}
-	// post.Description =
+	post.Description = this.RemoveHtml(body)
 	post.ParseDate = cygo.Now()
 	next_urls := this.GetAs(body, "http://"+post.Source)
 	return next_urls, nil

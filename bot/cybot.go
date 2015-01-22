@@ -8,6 +8,7 @@ import (
 	"cyeam_post/parser"
 	"reflect"
 	"strings"
+	// "time"
 )
 
 type CyBot struct {
@@ -31,15 +32,19 @@ func (this *CyBot) Start(root string) {
 	Q := []string{root}
 	Q_next := []string{}
 
-	// var a = 0
-	for len(Q) > 0 || len(Q_next) > 0 {
+	var i = 0
+	for i < 1 && (len(Q) > 0 || len(Q_next) > 0) {
 		// Log.Debug("%v", Q)
+		i++
 		for len(Q) != 0 {
 			u := Q[0]
 			Q = Q[1:]
 			if _, ok := res[u]; !ok { // 过滤掉抓取过的网页
+				Log.Info("Start parse: %s", u)
 				post, next_urls := this.new(u)
-				this.dao.AddPost(post)
+				if post != nil {
+					this.dao.AddPost(post)
+				}
 				for _, next_url := range next_urls {
 					exist := false
 					for _, white := range this.whitelist {
@@ -48,7 +53,7 @@ func (this *CyBot) Start(root string) {
 							break
 						}
 					}
-					Log.Trace("%v %s", exist, next_url)
+					// Log.Trace("%v %s", exist, next_url)
 					if exist {
 						Q_next = append(Q_next, next_url)
 					}
@@ -64,7 +69,11 @@ func (this *CyBot) Start(root string) {
 func (this *CyBot) new(root string) (*models.Post, []string) {
 	post := new(models.Post)
 	post.Link = root
-	next_urls, _ := this.parser.ParseHtml(post)
+	next_urls, err := this.parser.ParseHtml(post)
+	if err != nil {
+		Log.Error(err.Error())
+		return nil, nil
+	}
 	return post, next_urls
 }
 

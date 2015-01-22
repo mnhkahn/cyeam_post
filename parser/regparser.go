@@ -9,12 +9,13 @@ type RegParser struct {
 }
 
 var (
-	RE_HOST = regexp.MustCompile(`http(s)?://([\w-]+\.)+[\w-]+/?`)
-	RE_HTML = regexp.MustCompile("(?is)<.*?>")
-	RE_A    = regexp.MustCompile(`<a(.*?)href="(.*?)"(.*?)>(.*?)</a>`)
-	RE_HREF = regexp.MustCompile(`href=\"?(.*?)(\"|>|\\s+)`)
-	RE_IMG  = regexp.MustCompile("(?is)<img .*?>")
-	RE_SRC  = regexp.MustCompile(`src=\"?(.*?)(\"|>|\\s+)`)
+	RE_HOST  = regexp.MustCompile(`http(s)?://([\w-]+\.)+[\w-]+/?`)
+	RE_HTML  = regexp.MustCompile("(?is)<.*?>")
+	RE_A     = regexp.MustCompile(`<a(.*?)href="(.*?)"(.*?)>(.*?)</a>`)
+	RE_HREF  = regexp.MustCompile(`href=\"?(.*?)(\"|>|\\s+)`)
+	RE_IMG   = regexp.MustCompile("(?is)<img .*?>")
+	RE_SRC   = regexp.MustCompile(`src=\"?(.*?)(\"|>|\\s+)`)
+	RE_TITLE = regexp.MustCompile("(?is)<title>.*?</title>")
 )
 
 func (this *RegParser) RemoveHtml(src string) string {
@@ -29,7 +30,7 @@ func (this *RegParser) GetAs(body, host string) []string {
 			temp = temp[strings.Index(string(temp), "href")+6 : len(temp)-1]
 			next_urls[i] = string(temp)
 			// 如果url以/开头，需要拼接上http协议头和域名
-			if strings.HasPrefix(next_urls[i], "/") {
+			if next_urls[i] == "" || strings.HasPrefix(next_urls[i], "/") {
 				next_urls[i] = host + next_urls[i]
 			}
 			// 如果url中包含标签#，需要将标签删掉
@@ -45,4 +46,13 @@ func (this *RegParser) GetAs(body, host string) []string {
 
 func (this *RegParser) GetImgs(body string) []string {
 	return RE_IMG.FindAllString(body, -1)
+}
+
+func (this *RegParser) GetImgSrc(image string) string {
+	src := RE_SRC.FindString(image)
+	return src[5 : len(src)-1]
+}
+
+func (this *RegParser) GetTitle(body string) string {
+	return this.RemoveHtml(RE_TITLE.FindString(body))
 }
