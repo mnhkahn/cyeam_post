@@ -42,6 +42,7 @@ func (this *CyBot) Start(root string) {
 			if _, ok := res[u]; !ok { // 过滤掉抓取过的网页
 				Log.Info("Start parse: %s", u)
 				post, next_urls := this.new(u)
+				Log.Debug("%v", next_urls)
 				if post != nil {
 					this.dao.AddPost(post)
 				}

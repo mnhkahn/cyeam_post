@@ -12,9 +12,12 @@ import (
 type CyParser struct {
 	RegParser
 	NormalParser
+	document *CssParser
 }
 
 func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
+	next_urls := []string{}
+
 	var err error
 	post.Source, err = this.GetHost(post.Link)
 	if err != nil {
@@ -22,7 +25,7 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 	}
 	req := goreq.Request{
 		Method:    "GET",
-		Uri:       post.Link + "?v=1",
+		Uri:       post.Link,
 		UserAgent: "Cyeambot",
 		Timeout:   time.Duration(60) * time.Second,
 		ShowDebug: true,
@@ -36,27 +39,32 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 		panic(err)
 	}
 
+	// 得到字符串来解析出征文
 	body, err := res.Body.ToString()
 	if err != nil {
 		return nil, err
 	}
-	post.Title = this.GetTitle(body)
-	post.CreateTime = cygo.Now()
-	post.Author = "Cyeam"
-	post.Detail = body
-	imgs := this.GetImgs(body)
-	// fmt.Println(imgs)
+	// post.Detail = body
+	// post.Description = this.RemoveHtml(body)
+
+	this.document, err = NewCssParser(strings.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	post.Title = this.document.GetTitle()
+	imgs := this.document.GetImgs()
 	if len(imgs) > 0 {
-		src := this.GetImgSrc(imgs[0])
-		if strings.HasPrefix(src, "/") {
-			post.Figure = "http://" + post.Source + src
+		if strings.HasPrefix(imgs[0], "/") {
+			post.Figure = "http://" + post.Source + imgs[0]
 		} else {
-			post.Figure = src
+			post.Figure = imgs[0]
 		}
 	}
-	post.Description = this.RemoveHtml(body)
+	next_urls = this.document.GetAs("http://" + post.Source)
+
+	post.CreateTime = cygo.Now()
 	post.ParseDate = cygo.Now()
-	next_urls := this.GetAs(body, "http://"+post.Source)
 	return next_urls, nil
 }
 
