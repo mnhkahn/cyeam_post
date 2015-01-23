@@ -17,7 +17,9 @@ func NewCssParser(r io.Reader) (*CssParser, error) {
 	return parser, err
 }
 
+// h1就是文章标题，如果没有搜到，用title标签
 func (this *CssParser) GetTitle() string {
+	h1 := this.Document.Find("h1").Text()
 	return this.Document.Find("title").Text()
 }
 
