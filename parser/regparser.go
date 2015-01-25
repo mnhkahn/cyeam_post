@@ -9,16 +9,19 @@ type RegParser struct {
 }
 
 var (
-	RE_HOST  = regexp.MustCompile(`http(s)?://([\w-]+\.)+[\w-]+/?`)
-	RE_HTML  = regexp.MustCompile("(?is)<.*?>")
-	RE_A     = regexp.MustCompile(`<a(.*?)href="(.*?)"(.*?)>(.*?)</a>`)
-	RE_HREF  = regexp.MustCompile(`href=\"?(.*?)(\"|>|\\s+)`)
-	RE_IMG   = regexp.MustCompile("(?is)<img .*?>")
-	RE_SRC   = regexp.MustCompile(`src=\"?(.*?)(\"|>|\\s+)`)
-	RE_TITLE = regexp.MustCompile("(?is)<title>.*?</title>")
+	RE_HOST        = regexp.MustCompile(`http(s)?://([\w-]+\.)+[\w-]+/?`)
+	RE_HTML        = regexp.MustCompile("(?is)<.*?>")
+	RE_A           = regexp.MustCompile(`<a(.*?)href="(.*?)"(.*?)>(.*?)</a>`)
+	RE_HREF        = regexp.MustCompile(`href=\"?(.*?)(\"|>|\\s+)`)
+	RE_IMG         = regexp.MustCompile("(?is)<img .*?>")
+	RE_SRC         = regexp.MustCompile(`src=\"?(.*?)(\"|>|\\s+)`)
+	RE_TITLE       = regexp.MustCompile("(?is)<title>.*?</title>")
+	RE_SCRIPT_BODY = regexp.MustCompile("(?is)<script.*?</script>")
 )
 
 func (this *RegParser) RemoveHtml(src string) string {
+	// 预处理，剔除脚本内容
+	src = RE_SCRIPT_BODY.ReplaceAllString(src, "")
 	return RE_HTML.ReplaceAllString(src, "")
 }
 
