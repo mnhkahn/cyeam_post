@@ -3,7 +3,6 @@ package parser
 import (
 	"cyeam_post/cygo"
 	"cyeam_post/models"
-	// "fmt"
 	"github.com/franela/goreq"
 	"strings"
 	"time"
@@ -28,7 +27,7 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 		Uri:       post.Link,
 		UserAgent: "Cyeambot",
 		Timeout:   time.Duration(60) * time.Second,
-		ShowDebug: true,
+		// ShowDebug: true,
 		// Proxy:       "http://114.255.183.173:8080",
 		// Compression: goreq.Gzip(),
 	}
@@ -44,9 +43,8 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	// post.Detail = body
-	// post.Description = this.RemoveHtml(body)
-
+	post.Detail = body
+	post.Description = this.GetMainBody(this.RemoveHtml(body))
 	this.document, err = NewCssParser(strings.NewReader(body))
 	if err != nil {
 		return nil, err
