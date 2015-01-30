@@ -3,15 +3,29 @@ package parser
 import (
 	"cyeam_post/cygo"
 	"cyeam_post/models"
+	"fmt"
 	"github.com/franela/goreq"
+	"net/http"
 	"strings"
-	"time"
 )
 
 type CyParser struct {
 	RegParser
 	NormalParser
 	document *CssParser
+	req      *goreq.Request
+}
+
+func NewCyParser() *CyParser {
+	// goreq.SetConnectTimeout(time.Duration(60) * time.Second)
+	p := new(CyParser)
+	p.req = new(goreq.Request)
+	p.req.Method = "GET"
+	p.req.UserAgent = "Cyeambot"
+	// p.req.Timeout = time.Duration(60) * time.Second
+	p.req.AddHeader("Accept-Language", "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4")
+	// p.req.Compression = goreq.Gzip()
+	return p
 }
 
 func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
@@ -22,26 +36,21 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	req := goreq.Request{
-		Method:    "GET",
-		Uri:       post.Link,
-		UserAgent: "Cyeambot",
-		Timeout:   time.Duration(60) * time.Second,
-		// ShowDebug: true,
-		// Proxy:       "http://114.255.183.173:8080",
-		// Compression: goreq.Gzip(),
-	}
-	req.AddHeader("Accept-Language", "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4")
-	goreq.SetConnectTimeout(time.Duration(60) * time.Second)
-	res, err := req.Do()
-	if err != nil {
-		panic(err)
+
+	this.req.Uri = post.Link
+
+	// ShowDebug: true,
+	// Proxy:       "http://114.255.183.173:8080",
+
+	res, err := this.req.Do()
+	if err != nil || res.StatusCode != http.StatusOK {
+		return next_urls, fmt.Errorf("Unsupported status code: %d", res.StatusCode)
 	}
 
 	// 得到字符串来解析出征文
 	body, err := res.Body.ToString()
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	post.Detail = body
 	post.Description = this.GetMainBody(this.RemoveHtml(body))
@@ -67,5 +76,5 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 }
 
 func init() {
-	Register("CyParser", &CyParser{})
+	Register("CyParser", NewCyParser())
 }

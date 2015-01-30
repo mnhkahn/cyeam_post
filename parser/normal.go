@@ -30,7 +30,6 @@ func (this *NormalParser) GetMainBody(body string) string {
 			gap++
 		}
 		if gap > _limitGap && len(result) > 0 {
-			// panic(gap)
 			break
 		}
 		// 提取正文
@@ -43,5 +42,5 @@ func (this *NormalParser) GetMainBody(body string) string {
 		}
 	}
 
-	return result
+	return strings.Trim(result, " ")
 }

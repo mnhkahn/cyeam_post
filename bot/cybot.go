@@ -23,7 +23,8 @@ func (this *CyBot) Init(parser parser.Parser, dao dao.DaoContainer) {
 	this.Name = reflect.TypeOf(this).String()
 	this.parser = parser
 	this.dao = dao
-	this.whitelist = []string{"cyeam.com"}
+	this.whitelist = []string{"localhost:4000"}
+	// this.whitelist = []string{"cyeam.com"}
 }
 
 func (this *CyBot) Start(root string) {
@@ -32,17 +33,17 @@ func (this *CyBot) Start(root string) {
 	Q := []string{root}
 	Q_next := []string{}
 
-	var i = 0
-	for i < 1 && (len(Q) > 0 || len(Q_next) > 0) {
+	// var i = 0
+	for len(Q) > 0 || len(Q_next) > 0 {
 		// Log.Debug("%v", Q)
-		i++
+		// i++
 		for len(Q) != 0 {
 			u := Q[0]
 			Q = Q[1:]
 			if _, ok := res[u]; !ok { // 过滤掉抓取过的网页
 				Log.Info("Start parse: %s", u)
 				post, next_urls := this.new(u)
-				Log.Debug("%v", next_urls)
+				// Log.Debug("%v", next_urls)
 				if post != nil {
 					this.dao.AddPost(post)
 				}

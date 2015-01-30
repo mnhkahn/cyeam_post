@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -18,9 +19,11 @@ import (
 // }
 
 func TestMainBody(t *testing.T) {
-	p := NormalParser{}
-	reg := RegParser{}
-	main := p.GetMainBody(reg.RemoveHtml(body_post))
+	// p := NormalParser{}
+	p, _ := NewCssParser(strings.NewReader(body))
+	// reg := RegParser{}
+	// main := p.GetMainBody(reg.RemoveHtml(body_post))
+	main := p.GetMainBody()
 	fmt.Println(main)
 }
 

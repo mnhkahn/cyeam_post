@@ -58,6 +58,6 @@ func (this *CssParser) GetAs(host string) []string {
 	return as
 }
 
-func (this *CssParser) GetBody() string {
+func (this *CssParser) GetMainBody() string {
 	return this.Document.Find("html").Text()
 }
