@@ -43,9 +43,13 @@ func (this *CyBot) Start(root string) {
 			if _, ok := res[u]; !ok { // 过滤掉抓取过的网页
 				Log.Info("Start parse: %s", u)
 				post, next_urls := this.new(u)
-				// Log.Debug("%v", next_urls)
 				if post != nil {
-					this.dao.AddPost(post)
+					// If got nothing by parsing, skip it
+					if post.Description == "" {
+						Log.Info("Parse %s success", post.Link)
+						this.dao.AddPost(post)
+					}
+
 				}
 				for _, next_url := range next_urls {
 					exist := false
@@ -60,6 +64,7 @@ func (this *CyBot) Start(root string) {
 						Q_next = append(Q_next, next_url)
 					}
 				}
+				// If parse fail, it's need to save it anyway
 				res[u] = post
 			}
 		}

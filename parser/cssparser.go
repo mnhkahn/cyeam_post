@@ -19,11 +19,11 @@ func NewCssParser(r io.Reader) (*CssParser, error) {
 
 // h1就是文章标题，如果没有搜到，用title标签
 func (this *CssParser) GetTitle() string {
-	h1 := this.Document.Find("h1").Text()
-	if h1 == "" {
+	if this.Document.Find("h1").Length() == 1 {
+		return this.Document.Find("h1").Text()
+	} else {
 		return this.Document.Find("title").Text()
 	}
-	return h1
 }
 
 func (this *CssParser) GetImgs() []string {
