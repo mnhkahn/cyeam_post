@@ -7,10 +7,20 @@ import (
 	"fmt"
 )
 
+const (
+	DEFAULT_PARSE_LIMIT = 1
+	LOG_LEVEL_BOT       = 1
+	LOG_LEVEL_DAO       = 2
+	LOG_LEVEL_PARSER    = 4
+)
+
 type Bot interface {
+	Prepare()
 	Init(parser parser.Parser, dao dao.DaoContainer)
 	Start(root string)
-	Debug(is_debug bool)
+	Limit(maxcount int)
+	ParseCount() int
+	// Debug(is_debug bool)
 	Version() string
 }
 
@@ -36,6 +46,29 @@ func NewBot(name string) (Bot, error) {
 
 type BotBase struct {
 	common.CyeamBot
-	parser parser.Parser
-	dao    dao.DaoContainer
+	limit       int
+	parse_count int
+	log_level   int
+	parser      parser.Parser
+	dao         dao.DaoContainer
+}
+
+func (this *BotBase) CountOne() {
+	this.parse_count++
+}
+
+func (this *BotBase) Prepare() {
+	if this.log_level&LOG_LEVEL_BOT^LOG_LEVEL_BOT == 0 {
+		this.Debug(true)
+	}
+	if this.log_level&LOG_LEVEL_DAO^LOG_LEVEL_DAO == 0 {
+		this.dao.Debug(true)
+	}
+	if this.log_level&LOG_LEVEL_PARSER^LOG_LEVEL_PARSER == 0 {
+		this.parser.Debug(true)
+	}
+}
+
+func (this *BotBase) Debug(is_debug bool) {
+	this.IsDebug = is_debug
 }

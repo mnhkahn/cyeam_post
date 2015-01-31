@@ -20,8 +20,9 @@ func String(key string) string {
 func Strings(key string) []string {
 	return AppConfig.Strings(key)
 }
-func Int(key string) (int, error) {
-	return AppConfig.Int(key)
+func Int(key string) int {
+	i, _ := AppConfig.Int(key)
+	return i
 }
 func Int64(key string) (int64, error) {
 	return AppConfig.Int64(key)
