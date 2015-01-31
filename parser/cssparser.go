@@ -58,6 +58,13 @@ func (this *CssParser) GetAs(host string) []string {
 	return as
 }
 
-func (this *CssParser) GetMainBody() string {
-	return this.Document.Find("html").Text()
+func (this *CssParser) GetChildren(pattern string) []string {
+	res := []string{}
+	this.Document.Find(pattern).Children().Each(func(i int, s *goquery.Selection) {
+		html, err := s.Html()
+		if err == nil {
+			res = append(res, html)
+		}
+	})
+	return res
 }

@@ -67,21 +67,34 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 		panic(err)
 	}
 	post.Detail = body
-	post.Description = this.GetMainBody(this.RemoveHtml(body))
+
 	this.document, err = NewCssParser(strings.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
 
-	post.Title = this.document.GetTitle()
-	imgs := this.document.GetImgs()
-	if len(imgs) > 0 {
-		if strings.HasPrefix(imgs[0], "/") {
-			post.Figure = "http://" + post.Source + imgs[0]
-		} else {
-			post.Figure = imgs[0]
+	bchindren := this.document.GetChildren("body")
+	for _, r := range bchindren {
+		temp := this.RemoveHtml(r)
+		if len(temp) > len(post.Description) {
+			post.Description = temp
+			temp_document, err := NewCssParser(strings.NewReader(r))
+			if err != nil {
+				return nil, err
+			}
+			imgs := temp_document.GetImgs()
+			if len(imgs) > 0 {
+				if strings.HasPrefix(imgs[0], "/") {
+					post.Figure = "http://" + post.Source + imgs[0]
+				} else {
+					post.Figure = imgs[0]
+				}
+			}
 		}
 	}
+	// post.Description = this.GetMainBody(this.RemoveHtml(body))
+
+	post.Title = this.document.GetTitle()
 	next_urls = this.document.GetAs("http://" + post.Source)
 
 	post.CreateTime = cygo.Now()

@@ -33,17 +33,23 @@ func (this *CyBot) Start(root string) {
 	Q := []string{root}
 	Q_next := []string{}
 
-	// var i = 0
+	var i = 0
 	for len(Q) > 0 || len(Q_next) > 0 {
+		if i > 200 {
+			return
+		}
 		// Log.Debug("%v", Q)
-		// i++
 		for len(Q) != 0 {
+			if i > 200 {
+				return
+			}
 			u := Q[0]
 			Q = Q[1:]
 			if _, ok := res[u]; !ok { // 过滤掉抓取过的网页
 				Log.Info("Start parse: %s", u)
 				post, next_urls := this.new(u)
 				if post != nil {
+					i++
 					// If got nothing by parsing, skip it
 					if post.Description != "" {
 						Log.Info("Parse %s success", post.Link)
