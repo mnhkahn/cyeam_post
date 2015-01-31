@@ -2,6 +2,7 @@ package bot
 
 import (
 	"cyeam_post/common"
+	"cyeam_post/conf"
 	"cyeam_post/dao"
 	. "cyeam_post/logs"
 	"cyeam_post/models"
@@ -23,8 +24,7 @@ func (this *CyBot) Init(parser parser.Parser, dao dao.DaoContainer) {
 	this.Name = reflect.TypeOf(this).String()
 	this.parser = parser
 	this.dao = dao
-	this.whitelist = []string{"localhost:4000"}
-	// this.whitelist = []string{"cyeam.com"}
+	this.whitelist = strings.Split(conf.String("parse.whitelist"), ";")
 }
 
 func (this *CyBot) Start(root string) {
@@ -35,12 +35,12 @@ func (this *CyBot) Start(root string) {
 
 	var i = 0
 	for len(Q) > 0 || len(Q_next) > 0 {
-		if i > 200 {
+		if i > conf.DefaultInt("parse.maxcount", 1) {
 			return
 		}
 		// Log.Debug("%v", Q)
 		for len(Q) != 0 {
-			if i > 200 {
+			if i > conf.DefaultInt("parse.maxcount", 1) {
 				return
 			}
 			u := Q[0]
