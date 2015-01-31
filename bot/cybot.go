@@ -45,11 +45,10 @@ func (this *CyBot) Start(root string) {
 				post, next_urls := this.new(u)
 				if post != nil {
 					// If got nothing by parsing, skip it
-					if post.Description == "" {
+					if post.Description != "" {
 						Log.Info("Parse %s success", post.Link)
 						this.dao.AddPost(post)
 					}
-
 				}
 				for _, next_url := range next_urls {
 					exist := false
