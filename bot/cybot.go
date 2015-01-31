@@ -13,7 +13,6 @@ import (
 type CyBot struct {
 	parser.NormalParser
 	BotBase
-	whitelist []string
 }
 
 func (this *CyBot) Prepare() {
@@ -40,7 +39,6 @@ func (this *CyBot) Init(parser parser.Parser, dao dao.DaoContainer) {
 }
 
 func (this *CyBot) Start(root string) {
-	root = this.GetUrl(root)
 	res := make(map[string]*models.Post, 0)
 	Q := []string{root}
 	Q_next := []string{}
@@ -106,17 +104,9 @@ func (this *CyBot) new(root string) (*models.Post, []string) {
 	return post, next_urls
 }
 
-func (this *CyBot) Limit(maxcount int) {
-	this.limit = maxcount
-}
-
 func (this *CyBot) ParseCount() int {
 	return this.parse_count
 }
-
-// func (this *CyBot) Debug(is_debug bool) {
-// 	this.IsDebug = is_debug
-// }
 
 func (this *CyBot) Version() string {
 	return this.Name

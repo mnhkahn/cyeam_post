@@ -18,9 +18,8 @@ type Bot interface {
 	Prepare()
 	Init(parser parser.Parser, dao dao.DaoContainer)
 	Start(root string)
-	Limit(maxcount int)
+	// Limit(maxcount int)
 	ParseCount() int
-	// Debug(is_debug bool)
 	Version() string
 }
 
@@ -49,6 +48,7 @@ type BotBase struct {
 	limit       int
 	parse_count int
 	log_level   int
+	whitelist   []string
 	parser      parser.Parser
 	dao         dao.DaoContainer
 }
@@ -67,6 +67,10 @@ func (this *BotBase) Prepare() {
 	if this.log_level&LOG_LEVEL_PARSER^LOG_LEVEL_PARSER == 0 {
 		this.parser.Debug(true)
 	}
+}
+
+func (this *BotBase) Limit(maxcount int) {
+	this.limit = maxcount
 }
 
 func (this *BotBase) Debug(is_debug bool) {
