@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"cyeam_post/common"
 	"cyeam_post/conf"
 	"cyeam_post/dao"
 	. "cyeam_post/logs"
@@ -9,14 +8,11 @@ import (
 	"cyeam_post/parser"
 	"reflect"
 	"strings"
-	// "time"
 )
 
 type CyBot struct {
-	common.CyeamBot
 	parser.NormalParser
-	parser    parser.Parser
-	dao       dao.DaoContainer
+	BotBase
 	whitelist []string
 }
 
@@ -46,13 +42,17 @@ func (this *CyBot) Start(root string) {
 			u := Q[0]
 			Q = Q[1:]
 			if _, ok := res[u]; !ok { // 过滤掉抓取过的网页
-				Log.Info("Start parse: %s", u)
+				if this.IsDebug {
+					Log.Info("Start parse: %s", u)
+				}
 				post, next_urls := this.new(u)
 				if post != nil {
 					i++
 					// If got nothing by parsing, skip it
 					if post.Description != "" {
-						Log.Info("Parse %s success", post.Link)
+						if this.IsDebug {
+							Log.Info("Parse %s success", post.Link)
+						}
 						this.dao.AddPost(post)
 					}
 				}

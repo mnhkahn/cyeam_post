@@ -26,8 +26,9 @@ func Int(key string) (int, error) {
 func Int64(key string) (int64, error) {
 	return AppConfig.Int64(key)
 }
-func Bool(key string) (bool, error) {
-	return AppConfig.Bool(key)
+func Bool(key string) bool {
+	b, _ := AppConfig.Bool(key)
+	return b
 }
 func Float(key string) (float64, error) {
 	return AppConfig.Float(key)

@@ -7,6 +7,7 @@ import (
 
 type Parser interface {
 	ParseHtml(post *models.Post) ([]string, error)
+	Debug(is_debug bool)
 }
 
 var parsers = make(map[string]Parser)

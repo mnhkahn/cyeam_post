@@ -13,6 +13,7 @@ import (
 type CyParser struct {
 	RegParser
 	NormalParser
+	is_debug bool
 	document *CssParser
 	req      *goreq.Request
 }
@@ -29,6 +30,10 @@ func NewCyParser() *CyParser {
 	return p
 }
 
+func (this *CyParser) Debug(is_debug bool) {
+	this.is_debug = is_debug
+}
+
 func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 	next_urls := []string{}
 
@@ -39,8 +44,9 @@ func (this *CyParser) ParseHtml(post *models.Post) ([]string, error) {
 	}
 
 	this.req.Uri = post.Link
-
-	// ShowDebug: true,
+	if this.is_debug {
+		this.req.ShowDebug = true
+	}
 	// Proxy:       "http://114.255.183.173:8080",
 
 	res, err := this.req.Do()

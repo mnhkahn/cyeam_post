@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"cyeam_post/common"
 	"cyeam_post/dao"
 	. "cyeam_post/logs"
 	"cyeam_post/models"
@@ -13,9 +12,7 @@ import (
 )
 
 type RssBot struct {
-	common.CyeamBot
-	parser parser.Parser
-	dao    dao.DaoContainer
+	BotBase
 }
 
 func (this *RssBot) Init(parser parser.Parser, dao dao.DaoContainer) {
