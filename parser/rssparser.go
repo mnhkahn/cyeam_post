@@ -2,26 +2,20 @@ package parser
 
 import (
 	"cyeam_post/models"
+	"cyeam_post/utils"
 	"encoding/xml"
-	"github.com/astaxie/beego/httplib"
 	"strings"
 	"time"
 )
 
 type RssParser struct {
-	RegParser
-	is_debug bool
+	NormalParser
+	reg *utils.RegSelector
 }
 
-func (this *RssParser) Debug(is_debug bool) {
-	this.is_debug = is_debug
-}
-
-func (this *RssParser) ParseHtml(post *models.Post) ([]string, error) {
+func (this *RssParser) ParseHtml(post *models.Post, body string) ([]string, error) {
 	res := RssFeed{}
-	req := httplib.Get(post.Link)
-	req.SetTimeout(5*time.Second, 5*time.Second)
-	err := req.ToXml(&res)
+	err := xml.Unmarshal([]byte(body), &res)
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +41,7 @@ func (this *RssParser) ParseHtml(post *models.Post) ([]string, error) {
 		post.Detail = item.Description
 		post.Category = item.Category
 
-		temp_document, err := NewCssParser(strings.NewReader(item.Description))
+		temp_document, err := utils.NewCssSelector(strings.NewReader(item.Description))
 		if err != nil {
 			panic(err)
 		}
@@ -64,7 +58,7 @@ func (this *RssParser) ParseHtml(post *models.Post) ([]string, error) {
 		post.Source = item.Link
 		post.Link = item.Link
 		post.ParseDate.Time = time.Now()
-		post.Description = this.RemoveHtml(post.Detail)
+		post.Description = this.reg.RemoveHtml(post.Detail)
 	}
 	return nil, nil
 }

@@ -1,11 +1,11 @@
-package parser
+package utils
 
 import (
 	"regexp"
 	"strings"
 )
 
-type RegParser struct {
+type RegSelector struct {
 }
 
 var (
@@ -19,13 +19,13 @@ var (
 	RE_SCRIPT_BODY = regexp.MustCompile("(?is)<script.*?</script>")
 )
 
-func (this *RegParser) RemoveHtml(src string) string {
+func (this *RegSelector) RemoveHtml(src string) string {
 	// 预处理，剔除脚本内容
 	src = RE_SCRIPT_BODY.ReplaceAllString(src, "")
 	return RE_HTML.ReplaceAllString(src, "")
 }
 
-func (this *RegParser) GetAs(body, host string) []string {
+func (this *RegSelector) GetAs(body, host string) []string {
 	next_urls := RE_A.FindAllString(body, -1)
 	for i := 0; i < len(next_urls); i++ {
 		temp := RE_HREF.Find([]byte(next_urls[i]))
@@ -47,15 +47,15 @@ func (this *RegParser) GetAs(body, host string) []string {
 	return next_urls
 }
 
-func (this *RegParser) GetImgs(body string) []string {
+func (this *RegSelector) GetImgs(body string) []string {
 	return RE_IMG.FindAllString(body, -1)
 }
 
-func (this *RegParser) GetImgSrc(image string) string {
+func (this *RegSelector) GetImgSrc(image string) string {
 	src := RE_SRC.FindString(image)
 	return src[5 : len(src)-1]
 }
 
-func (this *RegParser) GetTitle(body string) string {
+func (this *RegSelector) GetTitle(body string) string {
 	return this.RemoveHtml(RE_TITLE.FindString(body))
 }

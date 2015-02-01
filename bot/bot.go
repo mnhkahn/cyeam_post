@@ -7,7 +7,10 @@ import (
 	"cyeam_post/models"
 	"cyeam_post/parser"
 	"fmt"
+	"github.com/franela/goreq"
+	"net/http"
 	"strings"
+	"time"
 )
 
 const (
@@ -15,6 +18,7 @@ const (
 	LOG_LEVEL_BOT       = 1
 	LOG_LEVEL_DAO       = 2
 	LOG_LEVEL_PARSER    = 4
+	LOG_LEVEL_REQ       = 8
 )
 
 type Bot interface {
@@ -57,6 +61,8 @@ type BotBase struct {
 	whitelist   []string
 	parser      parser.Parser
 	dao         dao.DaoContainer
+	Req         *goreq.Request
+	Resp        *goreq.Response
 }
 
 func (this *BotBase) CountOne() {
@@ -74,6 +80,15 @@ func (this *BotBase) initDaoParser(dao_name, dao_host, parser_type string) {
 	}
 	this.parser = Parser
 	this.dao = Dao
+
+	goreq.SetConnectTimeout(time.Duration(60) * time.Second)
+	this.Req = new(goreq.Request)
+	this.Req.Method = "GET"
+	this.Req.UserAgent = "Cyeambot"
+	this.Req.Timeout = time.Duration(60) * time.Second
+	this.Req.AddHeader("Accept-Language", "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4")
+	// p.req.Compression = goreq.Gzip()
+	//  Proxy:       "http://114.255.183.173:8080",
 }
 
 func (this *BotBase) Prepare() {
@@ -85,6 +100,9 @@ func (this *BotBase) Prepare() {
 	}
 	if this.log_level&LOG_LEVEL_PARSER^LOG_LEVEL_PARSER == 0 {
 		this.parser.Debug(true)
+	}
+	if this.log_level&LOG_LEVEL_REQ^LOG_LEVEL_REQ == 0 {
+		this.Req.ShowDebug = true
 	}
 }
 
@@ -143,15 +161,52 @@ func (this *BotBase) Start(root string) {
 }
 
 func (this *BotBase) Parse(root string) (*models.Post, []string) {
+	var err error
+
 	this.CountOne()
 	post := new(models.Post)
 	post.Link = root
-	next_urls, err := this.parser.ParseHtml(post)
+
+	this.Req.Uri = post.Link
+	this.Resp, err = this.Req.Do()
+	if err != nil {
+		return nil, nil
+	}
+
+	next_urls, err := this.doWithStatusCode()
+	if len(next_urls) > 0 {
+		return nil, nil
+	}
+
+	// 得到字符串来解析出征文
+	body, err := this.Resp.Body.ToString()
+	if err != nil {
+		return nil, nil
+	}
+
+	next_urls, err = this.parser.ParseHtml(post, body)
 	if err != nil {
 		Log.Error(err.Error())
 		return nil, nil
 	}
 	return post, next_urls
+}
+
+func (this *BotBase) doWithStatusCode() ([]string, error) {
+	// If status code is not 200 OK, skip it
+	if this.Resp.StatusCode != http.StatusOK {
+		// If status code is 301, the next url is in the response Header of Location
+		if this.Resp.StatusCode == http.StatusMovedPermanently {
+			return []string{this.Resp.Header.Get("Location")}, nil
+		} else {
+			return nil, fmt.Errorf("Unsupported status code: %d", this.Resp.StatusCode)
+		}
+	}
+	// If mime is not html, skip it
+	if strings.Index(this.Resp.Header.Get("Content-Type"), "text/html") == -1 {
+		return nil, fmt.Errorf("unsupported content type :%s", this.Resp.Header.Get("Content-Type"))
+	}
+	return nil, nil
 }
 
 func (this *BotBase) Save(post *models.Post) {

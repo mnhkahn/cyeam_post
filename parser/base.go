@@ -1,13 +1,22 @@
 package parser
 
 import (
-	// "bufio"
+	"cyeam_post/models"
 	"fmt"
 	"net/url"
 	"strings"
 )
 
 type NormalParser struct {
+	is_debug bool
+}
+
+func (this *NormalParser) ParseHtml(post *models.Post) ([]string, error) {
+	return nil, nil
+}
+
+func (this *NormalParser) Debug(is_debug bool) {
+	this.is_debug = is_debug
 }
 
 func (this *NormalParser) GetUrl(src string) string {
