@@ -10,7 +10,7 @@ func main() {
 
 func init() {
 	// app.Add("http://localhost:4000/", "CyBot")
-	app.Add("http://www.google.com/doodles/doodles.xml", "DoodleBot")
+	app.Add("http://www.google.com/doodles/doodles.xml", "RssBot")
 }
 
 // func timer() {
