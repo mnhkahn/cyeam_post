@@ -9,8 +9,8 @@ func main() {
 }
 
 func init() {
-	// app.Add("http://localhost:4000/", "CyBot")
-	app.Add("http://www.google.com/doodles/doodles.xml", "RssBot")
+	app.Add("http://localhost:4000/network/2015/01/29/dns/", "CyBot")
+	// app.Add("http://www.google.com/doodles/doodles.xml", "RssBot")
 }
 
 // func timer() {

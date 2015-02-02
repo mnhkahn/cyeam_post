@@ -1,21 +1,16 @@
 package parser
 
 import (
+	"cyeam_post/bot/parser/selector"
 	"cyeam_post/cygo"
 	"cyeam_post/models"
-	"cyeam_post/utils"
 	"strings"
 )
 
 type CyParser struct {
 	NormalParser
-	css *utils.CssSelector
-	reg *utils.RegSelector
-}
-
-func NewCyParser() *CyParser {
-	p := new(CyParser)
-	return p
+	css *selector.CssSelector
+	reg *selector.RegSelector
 }
 
 func (this *CyParser) ParseHtml(post *models.Post, body string) ([]string, error) {
@@ -28,7 +23,7 @@ func (this *CyParser) ParseHtml(post *models.Post, body string) ([]string, error
 		return nil, err
 	}
 
-	this.css, err = utils.NewCssSelector(strings.NewReader(body))
+	this.css, err = selector.NewCssSelector(strings.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +33,7 @@ func (this *CyParser) ParseHtml(post *models.Post, body string) ([]string, error
 		temp := this.reg.RemoveHtml(r)
 		if len(temp) > len(post.Description) {
 			post.Description = temp
-			temp_document, err := utils.NewCssSelector(strings.NewReader(r))
+			temp_document, err := selector.NewCssSelector(strings.NewReader(r))
 			if err != nil {
 				return nil, err
 			}
@@ -61,5 +56,5 @@ func (this *CyParser) ParseHtml(post *models.Post, body string) ([]string, error
 }
 
 func init() {
-	Register("CyParser", NewCyParser())
+	Register("CyParser", &CyParser{})
 }

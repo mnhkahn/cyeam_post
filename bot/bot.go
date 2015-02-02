@@ -1,11 +1,10 @@
 package bot
 
 import (
-	"cyeam_post/common"
+	"cyeam_post/bot/parser"
 	"cyeam_post/dao"
 	. "cyeam_post/logs"
 	"cyeam_post/models"
-	"cyeam_post/parser"
 	"fmt"
 	"github.com/franela/goreq"
 	"net/http"
@@ -24,7 +23,7 @@ const (
 type Bot interface {
 	Prepare()
 	Start(root string)
-	Parse(root string) (*models.Post, []string)
+	Parse(root string) (*models.Post, []string, error)
 	Save(*models.Post)
 	Limit(maxcount int)
 	ParseCount() int
@@ -54,7 +53,8 @@ func NewBot(name string) (Bot, error) {
 }
 
 type BotBase struct {
-	common.CyeamBot
+	Name        string
+	IsDebug     bool
 	limit       int
 	parse_count int
 	log_level   int
@@ -128,7 +128,10 @@ func (this *BotBase) Start(root string) {
 				if this.IsDebug {
 					Log.Info("Start parse: %s", u)
 				}
-				post, next_urls := this.Parse(u)
+				post, next_urls, err := this.Parse(u)
+				if err != nil {
+					Log.Error("Parse Error: %s.", err.Error())
+				}
 				if post != nil {
 					// If got nothing by parsing, skip it
 					if post.Description != "" {
@@ -160,7 +163,7 @@ func (this *BotBase) Start(root string) {
 	}
 }
 
-func (this *BotBase) Parse(root string) (*models.Post, []string) {
+func (this *BotBase) Parse(root string) (*models.Post, []string, error) {
 	var err error
 
 	this.CountOne()
@@ -170,26 +173,26 @@ func (this *BotBase) Parse(root string) (*models.Post, []string) {
 	this.Req.Uri = post.Link
 	this.Resp, err = this.Req.Do()
 	if err != nil {
-		return nil, nil
+		return nil, nil, err
 	}
 
 	next_urls, err := this.doWithStatusCode()
 	if len(next_urls) > 0 {
-		return nil, nil
+		return nil, nil, err
 	}
 
 	// 得到字符串来解析出征文
 	body, err := this.Resp.Body.ToString()
 	if err != nil {
-		return nil, nil
+		return nil, nil, err
 	}
 
 	next_urls, err = this.parser.ParseHtml(post, body)
 	if err != nil {
 		Log.Error(err.Error())
-		return nil, nil
+		return nil, nil, err
 	}
-	return post, next_urls
+	return post, next_urls, nil
 }
 
 func (this *BotBase) doWithStatusCode() ([]string, error) {

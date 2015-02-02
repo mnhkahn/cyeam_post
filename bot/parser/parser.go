@@ -6,7 +6,6 @@ import (
 )
 
 type Parser interface {
-	// Prepare()
 	ParseHtml(post *models.Post, body string) ([]string, error)
 	Debug(is_debug bool)
 }
