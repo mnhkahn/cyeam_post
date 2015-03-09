@@ -178,7 +178,7 @@ func (this *BotBase) Parse(root string) (*models.Post, []string, error) {
 
 	next_urls, err := this.doWithStatusCode()
 	if len(next_urls) > 0 {
-		return nil, nil, err
+		return nil, next_urls, err
 	}
 
 	// 得到字符串来解析出征文
